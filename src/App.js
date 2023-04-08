@@ -45,7 +45,6 @@ const App = () => {
       objectID: 4,
     },
   ];
-
   const onSearchChange = (searchTerm) => {
     setSearchText(searchTerm);
   };
@@ -69,14 +68,13 @@ const App = () => {
 
 const Search = ({ searchText, onSearchChange }) => {
   const onChange = (event) => {
-    const searchTerm = event.target.value;
-    onSearchChange(searchTerm);
+    onSearchChange(event.target.value);
   };
 
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={onChange} />
+      <input id="search" type="text" onChange={onChange} value={searchText} />
 
       <p>
         Searching for <strong>{searchText}</strong>
@@ -88,21 +86,21 @@ const Search = ({ searchText, onSearchChange }) => {
 const List = ({ list }) => {
   return (
     <ul>
-      {list.map((item) => (
-        <ListItem item={item} key={item.objectID} />
+      {list.map(({ objectID, ...item }) => (
+        <ListItem key={objectID} {...item} />
       ))}
     </ul>
   );
 };
 
-const ListItem = ({ item }) => (
+const ListItem = ({ url, title, author, num_comments, points }) => (
   <li>
     <span>
-      <a href={item.url}>{item.title}</a>
+      <a href={url}>{title}</a>
     </span>
-    <span> {item.author}</span>
-    <span> {item.num_comments}</span>
-    <span> {item.points}</span>
+    <span> {author}</span>
+    <span> {num_comments}</span>
+    <span> {points}</span>
   </li>
 );
 
