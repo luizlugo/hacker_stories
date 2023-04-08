@@ -2,8 +2,7 @@ import React from "react";
 import "./App.css";
 
 const App = () => {
-  console.log("App renders");
-
+  const [searchText, setSearchText] = React.useState("");
   const stories = [
     {
       title: "React",
@@ -47,22 +46,31 @@ const App = () => {
     },
   ];
 
+  const onSearchChange = (searchTerm) => {
+    setSearchText(searchTerm);
+  };
+  const filteredList = stories.filter((item) => {
+    return (
+      (searchText != null &&
+        item.title.toUpperCase().includes(searchText.toUpperCase())) ||
+      searchText == null
+    );
+  });
+
   return (
     <div>
       <h1>My Hacker Stories</h1>
-      <Search />
+      <Search searchText={searchText} onSearchChange={onSearchChange} />
       <hr />
-      <List list={stories} />
+      <List list={filteredList} />
     </div>
   );
 };
 
-const Search = () => {
-  console.log("Search renders");
-  const [searchText, setSearchText] = React.useState("");
-
+const Search = ({ searchText, onSearchChange }) => {
   const onChange = (event) => {
-    setSearchText(event.target.value);
+    const searchTerm = event.target.value;
+    onSearchChange(searchTerm);
   };
 
   return (
@@ -78,7 +86,6 @@ const Search = () => {
 };
 
 const List = ({ list }) => {
-  console.log("List renders");
   return (
     <ul>
       {list.map((item) => (
@@ -98,16 +105,5 @@ const ListItem = ({ item }) => (
     <span> {item.points}</span>
   </li>
 );
-
-class Developer {
-  constructor(firstName, lastName) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-  }
-
-  getName() {
-    return `${this.firstName} ${this.lastName}`;
-  }
-}
 
 export default App;
