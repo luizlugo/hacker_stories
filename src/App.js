@@ -1,8 +1,21 @@
 import React from "react";
 import "./App.css";
 
+// Custom hook
+const useSemiPersistenState = (key, initialState) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [key, value]);
+
+  return [value, setValue];
+};
+
 const App = () => {
-  const [searchText, setSearchText] = React.useState("");
+  const [searchText, setSearchText] = useSemiPersistenState("searchText", "");
   const stories = [
     {
       title: "React",
