@@ -1,5 +1,81 @@
-import React from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "./App.css";
+
+const actions = {
+  stories: {
+    SET_STORIES: "SET_STORIES",
+    REMOVE_STORIES: "REMOVE_STORIES",
+  },
+};
+
+const initialStoriesState = [
+  {
+    title: "React",
+    url: "https://reactjs.org/",
+    author: "Jordan Walke",
+    num_comments: 3,
+    points: 4,
+    objectID: 0,
+  },
+  {
+    title: "Redux",
+    url: "https://redux.js.org/",
+    author: "Dan Abramov, Andrew Clark",
+    num_comments: 2,
+    points: 5,
+    objectID: 1,
+  },
+  {
+    title: "Redux 2",
+    url: "https://redux.js.org/",
+    author: "Dan Abramov, Andrew Clark",
+    num_comments: 2,
+    points: 5,
+    objectID: 2,
+  },
+  {
+    title: "Redux 3",
+    url: "https://redux.js.org/",
+    author: "Dan Abramov, Andrew Clark",
+    num_comments: 2,
+    points: 5,
+    objectID: 3,
+  },
+  {
+    title: "Redux 4",
+    url: "https://redux.js.org/",
+    author: "Dan Abramov, Andrew Clark",
+    num_comments: 2,
+    points: 5,
+    objectID: 4,
+  },
+];
+// Async fake fetch
+const getAsyncStories = () =>
+  new Promise((resolve) => {
+    setTimeout(
+      () =>
+        resolve({
+          data: {
+            stories: initialStoriesState,
+          },
+        }),
+      2000
+    );
+  });
+
+const storiesReducer = (state, action) => {
+  switch (action.type) {
+    case actions.stories.SET_STORIES:
+      return action.payload;
+    case actions.stories.REMOVE_STORIES:
+      return state.filter(
+        (story) => story.objectID !== action.payload.objectID
+      );
+    default:
+      throw new Error();
+  }
+};
 
 // Custom hook
 const useSemiPersistenState = (key, initialState) => {
@@ -16,54 +92,11 @@ const useSemiPersistenState = (key, initialState) => {
 
 const App = () => {
   const [searchText, setSearchText] = useSemiPersistenState("searchText", "");
-  const [stories, setStories] = React.useState([
-    {
-      title: "React",
-      url: "https://reactjs.org/",
-      author: "Jordan Walke",
-      num_comments: 3,
-      points: 4,
-      objectID: 0,
-    },
-    {
-      title: "Redux",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectID: 1,
-    },
-    {
-      title: "Redux 2",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectID: 2,
-    },
-    {
-      title: "Redux 3",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectID: 3,
-    },
-    {
-      title: "Redux 4",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectID: 4,
-    },
-  ]);
-  const handleRemoveStory = (item) => {
-    const newStories = stories.filter(
-      (story) => story.objectID !== item.objectID
-    );
-    setStories(newStories);
-  };
+  const [stories, dispatchStories] = useReducer(storiesReducer, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const handleRemoveStory = (item) =>
+    dispatchStories({ type: actions.stories.REMOVE_STORIES, payload: item });
   const onSearchChange = (searchTerm) => {
     setSearchText(searchTerm);
   };
@@ -74,6 +107,20 @@ const App = () => {
       searchText == null
     );
   });
+
+  useEffect(() => {
+    setIsLoading(true);
+    getAsyncStories()
+      .then((result) => {
+        dispatchStories({
+          type: actions.stories.SET_STORIES,
+          payload: result.data.stories,
+        });
+        setIsLoading(false);
+        setIsError(false);
+      })
+      .catch((error) => setIsError(true));
+  }, []);
 
   return (
     <div>
@@ -86,7 +133,14 @@ const App = () => {
         <strong>Search</strong>
       </InputWithLabel>
       <hr />
-      <List list={filteredList} onRemoveItem={handleRemoveStory} />
+
+      {isError && <p>Something wen wrong...</p>}
+
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <List list={filteredList} onRemoveItem={handleRemoveStory} />
+      )}
     </div>
   );
 };
