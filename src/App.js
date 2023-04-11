@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import "./App.css";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query='";
@@ -56,17 +56,19 @@ const App = () => {
     isLoading: false,
     isError: false,
   });
+  const [url, setUrl] = useState(`${API_ENDPOINT}${searchText}`);
   const { stories, isError, isLoading } = storiesState;
   const handleRemoveStory = (item) =>
     dispatchStories({ type: actions.stories.REMOVE_STORIES, payload: item });
-  const onSearchChange = (searchTerm) => {
+  const onInputChange = (searchTerm) => {
     setSearchText(searchTerm);
   };
-
-  useEffect(() => {
-    if (searchText === "") return;
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchText}`);
+  };
+  const handleFetchStories = useCallback(() => {
     dispatchStories({ type: actions.stories.STORIES_FETCH_INIT });
-    fetch(`${API_ENDPOINT}${searchText}`)
+    fetch(url)
       .then((response) => response.json())
       .then((result) => {
         dispatchStories({
@@ -74,7 +76,11 @@ const App = () => {
           payload: result.hits,
         });
       });
-  }, [searchText]);
+  }, [url]);
+
+  useEffect(() => {
+    handleFetchStories();
+  }, [handleFetchStories]);
 
   return (
     <div>
@@ -82,10 +88,14 @@ const App = () => {
       <InputWithLabel
         id="search"
         value={searchText}
-        onInputChange={onSearchChange}
+        onInputChange={onInputChange}
       >
         <strong>Search</strong>
       </InputWithLabel>
+
+      <button type="button" disabled={!searchText} onClick={handleSearchSubmit}>
+        Submit
+      </button>
       <hr />
 
       {isError && <p>Something went wrong...</p>}
