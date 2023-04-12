@@ -64,20 +64,23 @@ const App = () => {
   const onInputChange = (searchTerm) => {
     setSearchText(searchTerm);
   };
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event) => {
     setUrl(`${API_ENDPOINT}${searchText}`);
+    event.preventDefault();
   };
-  const handleFetchStories = useCallback(() => {
+  const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: actions.stories.STORIES_FETCH_INIT });
-    axios
-      .get(url)
-      // .then((response) => response.json())
-      .then((result) => {
-        dispatchStories({
-          type: actions.stories.STORIES_FETCH_SUCCESS,
-          payload: result.data.hits,
-        });
+    try {
+      const result = await axios.get(url);
+      dispatchStories({
+        type: actions.stories.STORIES_FETCH_SUCCESS,
+        payload: result.data.hits,
       });
+    } catch {
+      dispatchStories({
+        type: actions.stories.STORIES_FETCH_ERROR,
+      });
+    }
   }, [url]);
 
   useEffect(() => {
@@ -87,17 +90,11 @@ const App = () => {
   return (
     <div>
       <h1>My Hacker Stories</h1>
-      <InputWithLabel
-        id="search"
-        value={searchText}
+      <SearchForm
+        searchText={searchText}
+        handleSearchSubmit={handleSearchSubmit}
         onInputChange={onInputChange}
-      >
-        <strong>Search</strong>
-      </InputWithLabel>
-
-      <button type="button" disabled={!searchText} onClick={handleSearchSubmit}>
-        Submit
-      </button>
+      />
       <hr />
 
       {isError && <p>Something went wrong...</p>}
@@ -110,6 +107,22 @@ const App = () => {
     </div>
   );
 };
+
+const SearchForm = ({ searchText, handleSearchSubmit, onInputChange }) => (
+  <form onSubmit={handleSearchSubmit}>
+    <InputWithLabel
+      id="search"
+      value={searchText}
+      onInputChange={onInputChange}
+    >
+      <strong>Search</strong>
+    </InputWithLabel>
+
+    <button type="submit" disabled={!searchText}>
+      Submit
+    </button>
+  </form>
+);
 
 const InputWithLabel = ({
   id,
