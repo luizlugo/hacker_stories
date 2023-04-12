@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
-import "./App.css";
+import styles from "./App.module.css";
 import axios from "axios";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query='";
@@ -88,8 +88,8 @@ const App = () => {
   }, [handleFetchStories]);
 
   return (
-    <div className="container">
-      <h1 className="headline-primary">My Hacker Stories</h1>
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>My Hacker Stories</h1>
       <SearchForm
         searchText={searchText}
         handleSearchSubmit={handleSearchSubmit}
@@ -108,7 +108,7 @@ const App = () => {
 };
 
 const SearchForm = ({ searchText, handleSearchSubmit, onInputChange }) => (
-  <form onSubmit={handleSearchSubmit} className="search-form">
+  <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
     <span>
       <InputWithLabel
         id="search"
@@ -121,7 +121,7 @@ const SearchForm = ({ searchText, handleSearchSubmit, onInputChange }) => (
       <button
         type="submit"
         disabled={!searchText}
-        className="button button_large"
+        className={`${styles.button} ${styles.buttonLarge}`}
       >
         Submit
       </button>
@@ -142,7 +142,7 @@ const InputWithLabel = ({
 
   return (
     <div>
-      <label htmlFor={id} className="label">
+      <label htmlFor={id} className={styles.label}>
         {children}
       </label>
       &nbsp;
@@ -151,7 +151,7 @@ const InputWithLabel = ({
         type={type}
         onChange={onChange}
         value={value}
-        className="input"
+        className={styles.input}
       />
     </div>
   );
@@ -168,7 +168,7 @@ const List = ({ list, onRemoveItem }) => {
 };
 
 const ListItem = ({ item, onRemoveItem }) => (
-  <li className="item">
+  <li className={styles.item}>
     <span style={{ width: "40%" }}>
       <a href={item.url}>{item.title}</a>
     </span>
@@ -179,7 +179,7 @@ const ListItem = ({ item, onRemoveItem }) => (
       <button
         type="button"
         onClick={() => onRemoveItem(item)}
-        className="button button_small"
+        className={`${styles.button} ${styles.buttonSmall}`}
       >
         Dismiss
       </button>
