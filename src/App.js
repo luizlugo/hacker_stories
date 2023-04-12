@@ -88,14 +88,13 @@ const App = () => {
   }, [handleFetchStories]);
 
   return (
-    <div>
-      <h1>My Hacker Stories</h1>
+    <div className="container">
+      <h1 className="headline-primary">My Hacker Stories</h1>
       <SearchForm
         searchText={searchText}
         handleSearchSubmit={handleSearchSubmit}
         onInputChange={onInputChange}
       />
-      <hr />
 
       {isError && <p>Something went wrong...</p>}
 
@@ -109,18 +108,24 @@ const App = () => {
 };
 
 const SearchForm = ({ searchText, handleSearchSubmit, onInputChange }) => (
-  <form onSubmit={handleSearchSubmit}>
-    <InputWithLabel
-      id="search"
-      value={searchText}
-      onInputChange={onInputChange}
-    >
-      <strong>Search</strong>
-    </InputWithLabel>
+  <form onSubmit={handleSearchSubmit} className="search-form">
+    <span>
+      <InputWithLabel
+        id="search"
+        value={searchText}
+        onInputChange={onInputChange}
+      >
+        <strong>Search</strong>
+      </InputWithLabel>
 
-    <button type="submit" disabled={!searchText}>
-      Submit
-    </button>
+      <button
+        type="submit"
+        disabled={!searchText}
+        className="button button_large"
+      >
+        Submit
+      </button>
+    </span>
   </form>
 );
 
@@ -137,8 +142,17 @@ const InputWithLabel = ({
 
   return (
     <div>
-      <label htmlFor={id}>{children}</label>&nbsp;
-      <input id={id} type={type} onChange={onChange} value={value} />
+      <label htmlFor={id} className="label">
+        {children}
+      </label>
+      &nbsp;
+      <input
+        id={id}
+        type={type}
+        onChange={onChange}
+        value={value}
+        className="input"
+      />
     </div>
   );
 };
@@ -154,15 +168,19 @@ const List = ({ list, onRemoveItem }) => {
 };
 
 const ListItem = ({ item, onRemoveItem }) => (
-  <li>
-    <span>
+  <li className="item">
+    <span style={{ width: "40%" }}>
       <a href={item.url}>{item.title}</a>
     </span>
-    <span> {item.author}</span>
-    <span> {item.num_comments}</span>
-    <span> {item.points} </span>
-    <span>
-      <button type="button" onClick={() => onRemoveItem(item)}>
+    <span style={{ width: "30%" }}> {item.author}</span>
+    <span style={{ width: "10%" }}> {item.num_comments}</span>
+    <span style={{ width: "10%" }}> {item.points} </span>
+    <span style={{ width: "10%" }}>
+      <button
+        type="button"
+        onClick={() => onRemoveItem(item)}
+        className="button button_small"
+      >
         Dismiss
       </button>
     </span>
